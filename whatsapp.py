@@ -1,4 +1,8 @@
+import asyncio
 import base64
+from queue import Queue
+from threading import Thread
+import time
 import requests
 import logging
 import json
@@ -20,6 +24,25 @@ VERSION = os.getenv("VERSION")
 
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
+
+message_queue = Queue()
+
+def queue_worker(app):
+    # current_app.app_context().push()
+    app.app_context().push()
+    # with current_app.test_request_context():
+    # with current_app.app_context():
+    while True:
+        if message_queue.empty():
+            print("Fila vazia. Aguardando novas mensagens...")
+        message = message_queue.get() # Pega a próxima mensagem da fila
+        logging.info(f"Received message: {message}")
+        if message is None:
+            print("is None")
+            break
+        with current_app.app_context():
+            handle_message(message)
+        message_queue.task_done()
 
 def send_message(message):
 
@@ -59,12 +82,22 @@ def get_text_message_input(recipient, text):
         }
     )
 
-message = "Olá! Eu sou o Assistente do Grupo Mediar"
+message = "Olá! Eu sou o Assistente do Grupo Mediar."
 send_message(message)
+send_message("Eu posso lhe ajudar com questões como: tirar dúvidas gerais sobre acordo assinado, enviar informações do pagamento e ajudar com a realização da assinatura digital.")
 # send_message_file()
 # send_message("Você tem alguma dúvida a respeito do documento assinado? Estou aqui para ajudar com qualquer questão que tenhas sobre ele. Você tem alguma dúvida ou preocupação?")
 
 def process_whatsapp_message(body):
+
+    # Filtrar mensagens por timestamp maior que a hora atual - 12 minutos (0.2 horas)
+    if "messages" in body["entry"][0]["changes"][0]["value"]:
+        current_time = time.time()
+        body["entry"][0]["changes"][0]["value"]["messages"] = [
+            message for message in body["entry"][0]["changes"][0]["value"]["messages"]
+            if int(message["timestamp"]) > (current_time - 1000 * 60 * 60 * 0.2) / 1000
+        ]
+
     wa_id = body["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
     name = body["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"]
 
@@ -92,9 +125,10 @@ def is_valid_whatsapp_message(body):
         and body["entry"][0]["changes"][0]["value"]["messages"][0]
     )
 
-def handle_message():
+def handle_message(message):
     print("handle_message")
-    body = request.get_json()
+    # body = request.get_json()
+    body = message
 
     if (
         body.get("entry", [{}])[0]
@@ -178,24 +212,18 @@ def send_file():
         print(response.status_code)
         print(response.text)
         return response
-    
-# sleep(10)
-# send_file()
-# message = "Olá! Eu sou o Assistente do Grupo Mediar."
-# send_message(message)
-
-###################################################################################################
-#                                       TOOLS
-###################################################################################################
-
 
 @webhook_blueprint.route("/webhook", methods=["GET"])
 def webhook_get():
     return verify()
 
+# @signature_required
 @webhook_blueprint.route("/webhook", methods=["POST"])
-@signature_required
 def webhook_post():
-    return handle_message()
 
+    if is_valid_whatsapp_message(request.get_json()):
+        # print("é valid")
+        message_queue.put(request.get_json())
+        return jsonify({"status": "received"}), 200
 
+    return handle_message(request.get_json())

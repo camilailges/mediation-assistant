@@ -1,42 +1,32 @@
 #!flask/bin/python
-from flask_session import Session
 import os
 import sys
 
 import logging
+import threading
 from flask import Flask
-
+from threading import Thread
 from config import load_configurations, configure_logging
-from whatsapp import webhook_blueprint
+from whatsapp import webhook_blueprint, message_queue, queue_worker
 
 app = Flask(__name__)
 
-load_configurations(app)
-configure_logging()
+with app.app_context():
+    load_configurations(app)
+    configure_logging()
+
 app.register_blueprint(webhook_blueprint)
 
-# @app.get("/webhook")
-# def hello_world():
-#     return "<p>Hello, World!</p>"
-
+worker_thread = Thread(target=queue_worker, args=(app,), daemon=True)
+worker_thread.start()
 
 if __name__ == "__main__":
     logging.info("Flask app started")
     app.run(host="0.0.0.0", port=8000)
 
-# app = Flask(__name__)
 
-# host = "0.0.0.0" if "--docker" in sys.argv else "localhost"
-# port = int(os.environ.get("PORT", 3000))
 
-# if os.environ.get("DEBUG", False) == "True":
-#     app.config["DEBUG"] = True
-#     app.config['SESSION_TYPE'] = 'filesystem'
-#     sess = Session()
-#     sess.init_app(app)
-#     app.run(host=host, port=port, debug=True)
-# else:
-#     app.config['SESSION_TYPE'] = 'filesystem'
-#     sess = Session()
-#     sess.init_app(app)
-#     app.run(host=host, port=port, extra_files="api_type.py")
+@app.teardown_appcontext
+def shutdown_worker(exception=None):
+    message_queue.put(None)  # Enviar um sinal para o worker encerrar
+    worker_thread.join()

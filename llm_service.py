@@ -21,21 +21,21 @@ VERSION = os.getenv("VERSION")
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
 
+llm = DeepInfraLLM(
+        model="meta-llama/Meta-Llama-3.1-70B-Instruct",
+        api_key="cuDds7vlAFb60oidHyeyL8gvtRmKoKdf",
+        temperature=0.5,
+        max_tokens=500,
+        additional_kwargs={"top_p": 0.9},
+    )
+
 # llm = DeepInfraLLM(
-#         model="meta-llama/Meta-Llama-3.1-70B-Instruct",
+#         model="meta-llama/Meta-Llama-3.1-405B-Instruct",
 #         api_key="euZJCXbEID98W7xPNFRVKEUNXxmrlLdm",
 #         temperature=0.5,
 #         max_tokens=500,
 #         additional_kwargs={"top_p": 0.9},
 #     )
-
-llm = DeepInfraLLM(
-        model="meta-llama/Meta-Llama-3.1-405B-Instruct",
-        api_key="euZJCXbEID98W7xPNFRVKEUNXxmrlLdm",
-        temperature=0.5,
-        max_tokens=500,
-        additional_kwargs={"top_p": 0.9},
-    )
 
 def send_message(message):
 

@@ -13,13 +13,13 @@ setenv VIRTUAL_ENV "/Users/i565646/Downloads/mediation-assistant-python"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"
+setenv VIRTUAL_ENV_PROMPT "mediation-assistant-python"
 
 
 set _OLD_VIRTUAL_PROMPT="$prompt"
 
 if (! "$?VIRTUAL_ENV_DISABLE_PROMPT") then
     set prompt = "(mediation-assistant-python) $prompt"
-    setenv VIRTUAL_ENV_PROMPT "(mediation-assistant-python) "
 endif
 
 alias pydoc python -m pydoc

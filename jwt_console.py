@@ -4,6 +4,7 @@ import subprocess
 
 from docusign_esign import ApiClient
 from docusign_esign.client.api_exception import ApiException
+from flask import jsonify
 from app.jwt_helpers import get_jwt_token, get_private_key
 from app.eSignature.examples.eg002_signing_via_email import Eg002SigningViaEmailController
 from app.jwt_config import DS_JWT
@@ -81,7 +82,7 @@ def run_example(private_key, api_client):
 # def main():
 # @tool
 def sendEnvelope(name, **kwargs):
-    f"""Envia o acordo para assinatura por e-mail para o usuário. Após, pergunta se {name} tem dúvidas sobre como prosseguir com a assinatura digital"""
+    f"""Envia o link para assinatura do acordo por e-mail para o usuário. Após, pergunta se {name} tem dúvidas sobre como prosseguir com a assinatura digital"""
     # Assuma que o usuário já tem as instruções sobre como fazer a assinatura digital do acordo, e portanto ela só quer recebê-lo. Se ela precisar que envie novamente o acordo, ela pedirá. Por isso não invoca nenhuma outra ferramenta após, sem que seja necessário.Após, não invoca nenhuma outra ferramenta, sem que {name} peça alguma outra informação.
     # """Você é um assistente de mediação extrajudicial da empresa Grupo Mediar. A pessoa {name} dos Santos vai pedir para enviar o acordo para assinatura por e-mail para ela"""
     print("sendEnvelope")
@@ -93,7 +94,7 @@ def sendEnvelope(name, **kwargs):
 
     try:
         run_example(private_key, api_client)
-        return 200
+        return jsonify({"status": "OK"}), 200
     except ApiException as err:
         body = err.body.decode('utf8')
 
