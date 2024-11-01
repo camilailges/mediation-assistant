@@ -35,7 +35,7 @@ def queue_worker(app):
     while True:
         if message_queue.empty():
             print("Fila vazia. Aguardando novas mensagens...")
-        message = message_queue.get() # Pega a próxima mensagem da fila
+        message = message_queue.get()
         logging.info(f"Received message: {message}")
         if message is None:
             print("is None")
@@ -63,8 +63,8 @@ def send_message(message):
     response = requests.post(url, data=json.dumps(payload), headers=headers)
     if response.status_code == 200:
         print("Status:", response.status_code)
-        print("Content-type:", response.headers["content-type"])
-        print("Body:", response.text)
+        # print("Content-type:", response.headers["content-type"])
+        # print("Body:", response.text)
         return response
     else:
         print(response.status_code)
@@ -217,12 +217,11 @@ def send_file():
 def webhook_get():
     return verify()
 
-# @signature_required
+@signature_required
 @webhook_blueprint.route("/webhook", methods=["POST"])
 def webhook_post():
 
     if is_valid_whatsapp_message(request.get_json()):
-        # print("é valid")
         message_queue.put(request.get_json())
         return jsonify({"status": "received"}), 200
 

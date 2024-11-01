@@ -82,7 +82,7 @@ def run_example(private_key, api_client):
 # def main():
 # @tool
 def sendEnvelope(name, **kwargs):
-    f"""Envia o link para assinatura do acordo por e-mail para o usuário. Após, pergunta se {name} tem dúvidas sobre como prosseguir com a assinatura digital"""
+    f"""Envia o link para assinatura digital do acordo por e-mail para o usuário. Após, pergunta se {name} tem dúvidas sobre como prosseguir com a assinatura digital, se sim, pode invocar a ferramenta send_signature_instructions. Após a assinatura, a plataforma do Docusign cuida de tudo e notifica a escola que o devedor assinou."""
     # Assuma que o usuário já tem as instruções sobre como fazer a assinatura digital do acordo, e portanto ela só quer recebê-lo. Se ela precisar que envie novamente o acordo, ela pedirá. Por isso não invoca nenhuma outra ferramenta após, sem que seja necessário.Após, não invoca nenhuma outra ferramenta, sem que {name} peça alguma outra informação.
     # """Você é um assistente de mediação extrajudicial da empresa Grupo Mediar. A pessoa {name} dos Santos vai pedir para enviar o acordo para assinatura por e-mail para ela"""
     print("sendEnvelope")
