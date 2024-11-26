@@ -13,7 +13,6 @@ import re
 
 from jwt_console import sendEnvelope
 from tools import generic, send_message_file, send_signature_instructions
-
 load_dotenv()
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 RECIPIENT_WAID = os.getenv("RECIPIENT_WAID")
@@ -22,22 +21,15 @@ VERSION = os.getenv("VERSION")
 
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
+API_KEY = os.getenv("API_KEY")
 
 llm = DeepInfraLLM(
         model="meta-llama/Meta-Llama-3.1-70B-Instruct",
-        api_key="cuDds7vlAFb60oidHyeyL8gvtRmKoKdf",
+        api_key=API_KEY,
         temperature=0.5,
         max_tokens=500,
         additional_kwargs={"top_p": 0.9},
     )
-
-# llm = DeepInfraLLM(
-#         model="meta-llama/Meta-Llama-3.1-405B-Instruct",
-#         api_key="euZJCXbEID98W7xPNFRVKEUNXxmrlLdm",
-#         temperature=0.5,
-#         max_tokens=500,
-#         additional_kwargs={"top_p": 0.9},
-#     )
 
 def send_message(message):
 

@@ -1,4 +1,5 @@
 from os import path
+import os
 import sys
 import subprocess
 
@@ -8,10 +9,13 @@ from flask import jsonify
 from app.jwt_helpers import get_jwt_token, get_private_key
 from app.eSignature.examples.eg002_signing_via_email import Eg002SigningViaEmailController
 from app.jwt_config import DS_JWT
-# from langchain_core.tools import tool
+from dotenv import load_dotenv
 
-# pip install DocuSign SDK
-# subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'docusign_esign'])
+load_dotenv()
+SIGNER_EMAIL = os.getenv("SIGNER_EMAIL")
+CC_EMAIL = os.getenv("CC_EMAIL")
+CC_NAME = os.getenv("CC_NAME")
+SIGNER_NAME = os.getenv("SIGNER_NAME")
 
 SCOPES = [
     "signature", "impersonation"
@@ -44,15 +48,11 @@ def get_token(private_key, api_client):
 
 
 def get_args(api_account_id, access_token, base_path):
-    # signer_email = input("Please enter the signer's email address: ")
-    # signer_name = input("Please enter the signer's name: ")
-    # cc_email = input("Please enter the cc email address: ")
-    # cc_name = input("Please enter the cc name: ")
 
-    signer_email = "camilailges@gmail.com"
-    signer_name = "camila"
-    cc_email = "martinhaelaine@gmail.com"
-    cc_name = "marta"
+    signer_email = SIGNER_EMAIL
+    signer_name = SIGNER_NAME
+    cc_email = CC_EMAIL
+    cc_name = CC_NAME
 
     envelope_args = {
         "signer_email": signer_email,
@@ -79,12 +79,12 @@ def run_example(private_key, api_client):
     print(envelope_id)
 
 
-# def main():
-# @tool
-def sendEnvelope(name, **kwargs):
-    f"""Envia o link para assinatura digital do acordo por e-mail para o usuário. Após o envio, diz que o e-mail foi enviado com sucesso e não invoca nenhuma outra assinatura. Após a assinatura, a plataforma do Docusign cuida de tudo e notifica a escola que o devedor assinou."""
-    # Assuma que o usuário já tem as instruções sobre como fazer a assinatura digital do acordo, e portanto ela só quer recebê-lo. Se ela precisar que envie novamente o acordo, ela pedirá. Por isso não invoca nenhuma outra ferramenta após, sem que seja necessário.Após, não invoca nenhuma outra ferramenta, sem que {name} peça alguma outra informação.
-    # """Você é um assistente de mediação extrajudicial da empresa Grupo Mediar. A pessoa {name} dos Santos vai pedir para enviar o acordo para assinatura por e-mail para ela"""
+def sendEnvelope(**kwargs):
+    f"""Envia o link para assinatura digital do acordo por e-mail para o usuário. Após o envio, diz que o e-mail foi enviado com sucesso e não invoca nenhuma outra assinatura. Após a assinatura, a plataforma do Docusign cuida de tudo e notifica a escola que o devedor assinou.
+    args:
+        none
+    """
+    
     print("sendEnvelope")
     api_client = ApiClient()
     api_client.set_base_path(DS_JWT["authorization_server"])
@@ -108,5 +108,3 @@ def sendEnvelope(name, **kwargs):
             else:
                 sys.exit("Please grant consent")
 
-
-# sendEnvelope()

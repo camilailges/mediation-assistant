@@ -14,7 +14,6 @@ from llm_service import generate_response, process_text_for_whatsapp
 from security import signature_required
 
 webhook_blueprint = Blueprint("webhook", __name__)
-# from .decorators.security import signature_required
 
 load_dotenv()
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
@@ -28,10 +27,7 @@ APP_SECRET = os.getenv("APP_SECRET")
 message_queue = Queue()
 
 def queue_worker(app):
-    # current_app.app_context().push()
     app.app_context().push()
-    # with current_app.test_request_context():
-    # with current_app.app_context():
     while True:
         if message_queue.empty():
             print("Fila vazia. Aguardando novas mensagens...")
@@ -63,8 +59,6 @@ def send_message(message):
     response = requests.post(url, data=json.dumps(payload), headers=headers)
     if response.status_code == 200:
         print("Status:", response.status_code)
-        # print("Content-type:", response.headers["content-type"])
-        # print("Body:", response.text)
         return response
     else:
         print(response.status_code)
@@ -85,8 +79,6 @@ def get_text_message_input(recipient, text):
 message = "Olá! Eu sou o Assistente do Grupo Mediar."
 send_message(message)
 send_message("Eu posso lhe ajudar com questões como: tirar dúvidas gerais sobre acordo assinado, enviar informações do pagamento e ajudar com a realização da assinatura digital.")
-# send_message_file()
-# send_message("Você tem alguma dúvida a respeito do documento assinado? Estou aqui para ajudar com qualquer questão que tenhas sobre ele. Você tem alguma dúvida ou preocupação?")
 
 def process_whatsapp_message(body):
 
@@ -127,7 +119,6 @@ def is_valid_whatsapp_message(body):
 
 def handle_message(message):
     print("handle_message")
-    # body = request.get_json()
     body = message
 
     if (
@@ -144,7 +135,6 @@ def handle_message(message):
             process_whatsapp_message(body)
             return jsonify({"status": "ok"}), 200
         else:
-            # if the request is not a WhatsApp API event, return an error
             return (
                 jsonify({"status": "error", "message": "Not a WhatsApp API event"}),
                 404,
@@ -182,18 +172,14 @@ def send_file():
     print("send_file entrou")
     docPath = 'acordo.pdf'
     fn = "anyname.pdf"
-    caption = "You will find it useful"  # caption is optional; can be None
+    caption = "You will find it useful"
 
-    # Encode the document in base64 format
     doc_base64 = None
     with open(docPath, 'rb') as doc:
         doc_base64 = base64.b64encode(doc.read())
-
-    # doc_base64_str = doc_base64.decode('utf-8')
-    # print("Documento em base64:", doc_base64_str)    
+ 
 
     url = 'https://khrh82bd-8000.brs.devtunnels.ms/v1/media'
-    # url = 'http://127.0.0.1:8000/v1/media'
 
     headers = {
         "Content-type": "application/pdf",
